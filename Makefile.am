@@ -37,3 +37,13 @@ ChangeLog: $(shell $(srcdir)/mkrelease.sh commit-stamps)
 	$(srcdir)/mkrelease.sh ChangeLog
 noinst_DATA = ChangeLog
 EXTRA_DIST += ChangeLog mkrelease.sh
+
+# == Release Rules ==
+release-news:
+	@$(srcdir)/mkrelease.sh news
+release-check:
+	@echo "Checking for unlisted contributors..."
+	@$(srcdir)/mkrelease.sh contributors -X -B timj
+release-upload: ChangeLog
+	$(srcdir)/mkrelease.sh upload -U dist.testbit.eu:dist/testbit-tools/ -E configure.ac:TESTBIT_TOOLS_REVISION
+.PHONY: release-news release-check release-upload
