@@ -11,5 +11,12 @@ Makefile
 /aclocal.m4
 /autom4te.cache
 /cache
+/config.log
+/config.status
+/configure
+/configure.h
+/configure.h.in
+/libtool
+/stamp-h1
 
 /wikihtml2man.1
