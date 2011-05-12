@@ -21,7 +21,7 @@ AC_CONFIG_AUX_DIR([autotools])
 AC_PREREQ([2.67])
 AC_PROG_MAKE_SET
 AC_CONFIG_HEADER(configure.h)
-AM_INIT_AUTOMAKE([1.10 check-news dist-bzip2 no-dist-gzip std-options -Wno-portability])
+AM_INIT_AUTOMAKE([1.10 check-news dist-bzip2 no-dist-gzip -Wno-portability])
 AM_MAINTAINER_MODE # maintainer-mode might require exotic tools
 AM_SILENT_RULES([yes])
 
