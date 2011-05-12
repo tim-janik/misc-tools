@@ -16,13 +16,16 @@ m4_divert_text([NOTICE],[
   debug_default=minimum
 ])
 # Autoconf, automake, etc setup
-AM_INIT_AUTOMAKE([1.10 check-news dist-bzip2 no-dist-gzip std-options -Wno-portability])
 AC_CONFIG_MACRO_DIR([autotools])
+AC_CONFIG_AUX_DIR([autotools])
 AC_PREREQ([2.67])
 AC_PROG_MAKE_SET
 AC_CONFIG_HEADER(configure.h)
+AM_INIT_AUTOMAKE([1.10 check-news dist-bzip2 no-dist-gzip std-options -Wno-portability])
 AM_MAINTAINER_MODE # maintainer-mode might require exotic tools
 AM_SILENT_RULES([yes])
+
+# Configure arguments.
 AC_ARG_ENABLE(debug,           [  --enable-debug=no/minimum/yes  turn on debugging],,enable_debug=$debug_default)
 
 # Checks for programs.
