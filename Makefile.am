@@ -4,12 +4,14 @@ ACLOCAL_AMFLAGS = -I autotools
 cache_files     =
 cache_deps      =
 man_MANS        = $(man_targets)
+EXTRA_DIST=
 CLEANFILES=
 MAINTAINERCLEANFILES=
 
 # == wikihtml2man.py ==
 bin_SCRIPTS = wikihtml2man.py
 cache_deps += wikihtml2man.py
+EXTRA_DIST += wikihtml2man.py
 
 # == wikihtml2man.1 ==
 man_targets = wikihtml2man.1
@@ -17,8 +19,9 @@ cache_files += cache/wikihtml2man.1
 
 # == man generation ==
 %.1: @MAINTAINER_MODE_TRUE@ cache/%.1
-	./wikihtml2man.py $< >xgen-$@
+	$(srcdir)/wikihtml2man.py $< >xgen-$@
 	mv xgen-$@ $@ ; rm -f xgen-$@
+EXTRA_DIST += $(man_targets)
 CLEANFILES += $(man_targets)
 
 # == online cache ==
@@ -33,4 +36,4 @@ clean-local: @MAINTAINER_MODE_TRUE@ ; rm -rf cache/
 ChangeLog: $(shell $(srcdir)/mkrelease.sh commit-stamps)
 	$(srcdir)/mkrelease.sh ChangeLog
 noinst_DATA = ChangeLog
-EXTRA_DIST  = ChangeLog mkrelease.sh
+EXTRA_DIST += ChangeLog mkrelease.sh
