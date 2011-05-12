@@ -277,7 +277,7 @@ done
     || fail "note: NEWS appears to be newer; make distcheck"
   [ -n "$REVISIONVAR" ] && {
     msg "Checking revision variable to match version..."
-    N=`sed -ne "/^$REVISIONVAR_NAME\s*=\s*[0-9]/ { s/^[^=]*=\s*\([0-9]\+\).*/\1/ ; p ; q }" $REVISIONVAR_FILE`
+    N=`sed -ne "/^\s*$REVISIONVAR_NAME\s*=\s*[0-9]/ { s/^[^=]*=\s*\([0-9]\+\).*/\1/ ; p ; q }" $REVISIONVAR_FILE`
     [ -n "$N" -a "$N" = "$REVISION" ] && ok \
       || fail "note: mismatching revisions for $VERSION: '$REVISION' != '$N'"
     msg "Checking for git tracking of $REVISIONVAR_FILE..."
