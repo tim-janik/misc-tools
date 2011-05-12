@@ -1,0 +1,15 @@
+Makefile.in
+Makefile
+.deps
+.libs
+*.pyc
+*.la
+*.lo
+*.o
+/ChangeLog
+/INSTALL
+/aclocal.m4
+/autom4te.cache
+/cache
+
+/wikihtml2man.1
