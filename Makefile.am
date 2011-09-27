@@ -16,6 +16,9 @@ EXTRA_DIST += wikihtml2man.py
 # == wikihtml2man.1 ==
 man_targets = wikihtml2man.1
 cache_files += cache/wikihtml2man.1
+wikihtml2man-check: wikihtml2man.1
+	@ grep -q '\.TH.*WIKIHTML2MAN' wikihtml2man.1 ; eval "$$TSTDIAGNOSE"
+check: wikihtml2man-check
 
 # == man generation ==
 %.1: @MAINTAINER_MODE_TRUE@ cache/%.1
