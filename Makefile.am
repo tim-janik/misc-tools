@@ -32,6 +32,21 @@ $(cache_files): $(cache_deps) | cache/
 CLEANFILES += @MAINTAINER_MODE_TRUE@ $(cache_files)
 clean-local: @MAINTAINER_MODE_TRUE@ ; rm -rf cache/
 
+# == Test Utilities ==
+export MAKE_TARGET_FILE = $(@F)
+export FAILOK           = FAIL  OK
+export TSTDIAGNOSE = _e=$$?; tstdiagnose() { printf '  CHECK  %-64s%s\n' "$${1:-$$MAKE_TARGET_FILE}:" \
+                                "$${FAILOK:$$(($$_e?0:6)):6}"; [ $$_e = 0 ] || exit $$_e; }; tstdiagnose
+# == buglist.py ==
+buglist-check-fd:  ; @ echo      1 | ./buglist.py fd   | grep -q "Optimizations" ; eval "$$TSTDIAGNOSE"
+buglist-check-gb:  ; @ echo 598490 | ./buglist.py gb   | grep -q "Beast.*Guile" ; eval "$$TSTDIAGNOSE"
+buglist-check-gcc: ; @ echo  50456 | ./buglist.py gcc  | grep -q "attributes.*templates" ; eval "$$TSTDIAGNOSE"
+buglist-check-libc:; @ echo  12894 | ./buglist.py libc | grep -q "systemd" ; eval "$$TSTDIAGNOSE"
+buglist-check-mb:  ; @ echo   6791 | ./buglist.py mb   | grep -q "context.*menu" ; eval "$$TSTDIAGNOSE"
+buglist-check-moz: ; @ echo 489834 | ./buglist.py moz  | grep -q "DXR" ; eval "$$TSTDIAGNOSE"
+buglist-check-xm:  ; @ echo    830 | ./buglist.py xm   | grep -q "MonoDevelop.*MacOS" ; eval "$$TSTDIAGNOSE"
+check: buglist-check-fd buglist-check-gb buglist-check-gcc buglist-check-libc buglist-check-mb buglist-check-moz buglist-check-xm
+
 # == ChangeLog ==
 ChangeLog: $(shell $(srcdir)/mkrelease.sh commit-stamps)
 	$(srcdir)/mkrelease.sh ChangeLog
