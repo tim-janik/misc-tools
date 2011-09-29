@@ -54,13 +54,13 @@ EXTRA_DIST += buglist.py
 buglist-installcheck:
 	$(Q) buglist --bug-tracker-list | grep -qF gcc ; eval "$$TSTDIAGNOSE"
 installcheck-local: buglist-installcheck
-buglist-check-fd:  ; @ echo      1 | ./buglist.py fd   | grep -q "Optimizations" ; eval "$$TSTDIAGNOSE"
-buglist-check-gb:  ; @ echo 598490 | ./buglist.py gb   | grep -q "Beast.*Guile" ; eval "$$TSTDIAGNOSE"
-buglist-check-gcc: ; @ echo  50456 | ./buglist.py gcc  | grep -q "attributes.*templates" ; eval "$$TSTDIAGNOSE"
-buglist-check-libc:; @ echo  12894 | ./buglist.py libc | grep -q "systemd" ; eval "$$TSTDIAGNOSE"
-buglist-check-mb:  ; @ echo   6791 | ./buglist.py mb   | grep -q "context.*menu" ; eval "$$TSTDIAGNOSE"
-buglist-check-moz: ; @ echo 489834 | ./buglist.py moz  | grep -q "DXR" ; eval "$$TSTDIAGNOSE"
-buglist-check-xm:  ; @ echo    830 | ./buglist.py xm   | grep -q "MonoDevelop.*MacOS" ; eval "$$TSTDIAGNOSE"
+buglist-check-fd:  ; @ echo      1 | ./buglist fd   | grep -q "Optimizations" ; eval "$$TSTDIAGNOSE"
+buglist-check-gb:  ; @ echo 598490 | ./buglist gb   | grep -q "Beast.*Guile" ; eval "$$TSTDIAGNOSE"
+buglist-check-gcc: ; @ echo  50456 | ./buglist gcc  | grep -q "attributes.*templates" ; eval "$$TSTDIAGNOSE"
+buglist-check-libc:; @ echo  12894 | ./buglist libc | grep -q "systemd" ; eval "$$TSTDIAGNOSE"
+buglist-check-mb:  ; @ echo   6791 | ./buglist mb   | grep -q "context.*menu" ; eval "$$TSTDIAGNOSE"
+buglist-check-moz: ; @ echo 489834 | ./buglist moz  | grep -q "DXR" ; eval "$$TSTDIAGNOSE"
+buglist-check-xm:  ; @ echo    830 | ./buglist xm   | grep -q "MonoDevelop.*MacOS" ; eval "$$TSTDIAGNOSE"
 check: buglist-check-fd buglist-check-gb buglist-check-gcc buglist-check-libc buglist-check-mb buglist-check-moz buglist-check-xm
 
 # == ChangeLog ==
