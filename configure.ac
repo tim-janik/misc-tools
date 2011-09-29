@@ -36,6 +36,16 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_LIBTOOL
 
+# Checks for Python.
+AM_PATH_PYTHON(2.5)
+AC_MSG_CHECKING([for usable Python])
+if $PYTHON -c "import sys; sys.exit (not sys.version_info >= (2,5))" && test -n "$pythondir" ; then
+   AC_MSG_RESULT(ok)
+else
+   AC_MSG_RESULT(fail)
+   AC_MSG_ERROR([failed to check \$PYTHON and \$pythondir])
+fi
+
 # Checks for libraries.
 
 # Checks for header files.
