@@ -41,6 +41,19 @@ export FAILOK           = FAIL  OK
 export TSTDIAGNOSE = _e=$$?; tstdiagnose() { printf '  CHECK  %-64s%s\n' "$${1:-$$MAKE_TARGET_FILE}:" \
                                 "$${FAILOK:$$(($$_e?0:6)):6}"; [ $$_e = 0 ] || exit $$_e; }; tstdiagnose
 # == buglist.py ==
+bin_SCRIPTS += buglist
+PYCONFIGVARS = "PKG_VERSION" : "${VERSION}"
+buglist: buglist.py Makefile.am
+	$(AM_V_GEN)
+	$(Q) sed <$< >xgen-$(@F)                        \
+	  -e '1,1s|#!/usr/bin/env python\([0-9]\+\(\.[0-9]\+\)\?\)\?|#!${PYTHON}|' \
+	  -e '1,24s|^ *#@PKGINSTALL_CONFIGVARS_IN24LINES@|  ${PYCONFIGVARS}|'
+	$(Q) chmod +x xgen-$(@F)
+	$(Q) cp -p xgen-$(@F) $@ && rm -f xgen-$(@F)
+EXTRA_DIST += buglist.py
+buglist-installcheck:
+	$(Q) buglist --bug-tracker-list | grep -qF gcc ; eval "$$TSTDIAGNOSE"
+installcheck-local: buglist-installcheck
 buglist-check-fd:  ; @ echo      1 | ./buglist.py fd   | grep -q "Optimizations" ; eval "$$TSTDIAGNOSE"
 buglist-check-gb:  ; @ echo 598490 | ./buglist.py gb   | grep -q "Beast.*Guile" ; eval "$$TSTDIAGNOSE"
 buglist-check-gcc: ; @ echo  50456 | ./buglist.py gcc  | grep -q "attributes.*templates" ; eval "$$TSTDIAGNOSE"
