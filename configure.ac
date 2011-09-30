@@ -10,7 +10,7 @@ AC_INIT([Testbit.eu/Tools],
 # Package definitions pushed to be available for --help
 m4_divert_text([NOTICE],[
   TESTBIT_TOOLS_YEAR=11		# increment when ABI or API changes
-  TESTBIT_TOOLS_MONTH=05	# increment when ABI or API changes
+  TESTBIT_TOOLS_MONTH=09	# increment when ABI or API changes
   TESTBIT_TOOLS_REVISION=0	# increment while ABI compatible, otherwise reset
   TESTBIT_TOOLS_VERSION=$TESTBIT_TOOLS_YEAR.$TESTBIT_TOOLS_MONTH.$TESTBIT_TOOLS_REVISION
   debug_default=minimum
