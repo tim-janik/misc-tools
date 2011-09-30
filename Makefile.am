@@ -53,22 +53,23 @@ installcheck-local: wikihtml2man-installcheck
 man_targets = wikihtml2man.1
 cache_files += cache/wikihtml2man.1
 wikihtml2man-check: wikihtml2man.1
-	@ grep -q '\.TH.*WIKIHTML2MAN' wikihtml2man.1 ; eval "$$TSTDIAGNOSE"
+	@ grep -q '\.TH.*WIKIHTML2MAN' $(srcdir)/wikihtml2man.1 ; eval "$$TSTDIAGNOSE"
 check: wikihtml2man-check
 
 # == man generation ==
 %.1: @MAINTAINER_MODE_TRUE@ cache/%.1
-	$(srcdir)/wikihtml2man.py $< >xgen-$@
-	mv xgen-$@ $@ ; rm -f xgen-$@
+	$(AM_V_GEN)
+	$(Q) $(srcdir)/wikihtml2man.py $< >xgen-$@
+	$(Q) mv xgen-$@ $@ ; rm -f xgen-$@
 EXTRA_DIST += $(man_targets)
 CLEANFILES += $(man_targets)
 
 # == online cache ==
-cache/: ; mkdir -p $@
+cache/: ; @ mkdir -p $@
 $(cache_files): $(cache_deps) | cache/
-	curl -sfS http://testbit.eu/$(@F)?action=render >$(@D)/xgen-$(@F)
-	mv $(@D)/xgen-$(@F) $@ ; rm -f $(@D)/xgen-$(@F)
-CLEANFILES += @MAINTAINER_MODE_TRUE@ $(cache_files)
+	$(AM_V_GEN)
+	$(Q) curl -sfS http://testbit.eu/$(@F)?action=render >$(@D)/xgen-$(@F)
+	$(Q) mv $(@D)/xgen-$(@F) $@ ; rm -f $(@D)/xgen-$(@F)
 clean-local: @MAINTAINER_MODE_TRUE@ ; rm -rf cache/
 
 # == Test Utilities ==
@@ -102,8 +103,10 @@ check: buglist-check-fd buglist-check-gb buglist-check-gcc buglist-check-libc bu
 # == ChangeLog & Release Rules ==
 noinst_DATA = ChangeLog
 ChangeLog: $(COMMIT_STAMPS) ./buildfay
-	./buildfay ChangeLog
+	$(AM_V_GEN)
+	$(Q) ./buildfay ChangeLog
 EXTRA_DIST += ChangeLog
+CLEANFILES += ChangeLog
 release-news: ./buildfay
 	@./buildfay news
 release-check: ./buildfay
