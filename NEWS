@@ -1,3 +1,9 @@
+Additions in version 11.09.0:
+
+* Added buglist.py, a script to list and download bugs from bug trackers.
+* Added buildfay, a script with various sub commands to aid release making.
+* Fixed version information for all tools.
+
 Additions in version 11.05.0:
 
 * Install manual page converter wikihtml2man.
