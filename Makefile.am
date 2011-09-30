@@ -30,7 +30,7 @@ CLEANFILES += buildfay
 buildfay-installcheck:
 	$(Q) buildfay --help | grep -qF ChangeLog ; eval "$$TSTDIAGNOSE"
 installcheck-local: buildfay-installcheck
-buildfay-check-describe: ; $(Q) ./buildfay describe   | grep -q "[0-9]\..*-" ; eval "$$TSTDIAGNOSE"
+buildfay-check-describe: ; $(Q) ./buildfay describe   | grep -q "[0-9]\.[0-9]" ; eval "$$TSTDIAGNOSE"
 check: buildfay-check-describe
 
 # == wikihtml2man.py ==
