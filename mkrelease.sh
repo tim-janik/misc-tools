@@ -4,6 +4,7 @@
 ## This work is provided "as is"; see: http://rapicorn.org/LICENSE-AS-IS
 
 MYVERSION="mkrelease.sh version 20100901"
+# 20110929: implemented 'describe' build version
 # 20110407: extract 'contributors' from NEWS files
 # 20100910: fixed 'commit-stamps' outside of git repos
 # 20100901: check HEAD against upstream repository, upload last
@@ -14,7 +15,7 @@ MYVERSION="mkrelease.sh version 20100901"
 # 20090605: ported to git-1.6.0
 # 20080515: take packed-refs into account as git stamp file
 # 20070820: implemented 'commit-stamps', handle non-symbolic git stamp files
-# 20070518: implemented 'ChangeLog' generation from git"
+# 20070518: implemented 'ChangeLog' generation from git
 # 20060217: implemented scp based remote file updates
 
 # === initial setup ===
@@ -37,6 +38,7 @@ usage() {
 	  commit-stamps		list stamp files affected by a commit
 	  contributors		extract contributor C strings from NEWS files
 	  ChangeLog		generate ChangeLog from git history
+	  describe		describe the git repository or release version
 	  news			list commits since last release tag
 	  upload		check and upload release tarball
 	  shellvar <FILE:VAR>	shell-eval VAR variable assignment in FILE
@@ -90,6 +92,20 @@ while test $# -ne 0 -a $parse_options = 1; do
   esac
   shift
 done
+
+# === commons definitions ===
+check_makefile() {
+  [ -r Makefile ] || die 7 "Failed to find and read Makefile"
+}
+parse_makefile_var() {
+  VARNAME="$1"
+  # find VARNAME, strip before '=', print and quit
+  sed -ne "/^[ \t]*$VARNAME[ \t]*=/ { s/^[^=]*=[ \t]*//; p; q }" < Makefile
+}
+ensure_version() {
+  # ensure VERSION, fallback to Makefile
+  [ "$VERSION" = "_parse" ] && check_makefile && VERSION="`parse_makefile_var VERSION`"
+}
 
 # === commit-stamps ===
 [ "$COMMAND" = "commit-stamps" ] && {
@@ -179,17 +195,21 @@ done
   exit
 }
 
+# === describe ===
+[ "$COMMAND" = "describe" ] && {
+  ensure_version
+  ID=`git describe --long --dirty 2>/dev/null` # --abbrev=11
+  test -n "$ID" || {
+    ID="$VERSION"
+    test -r ChangeLog && ID="$ID"`sed -n "1,1{s/.*# /-r/;p}" < ChangeLog`
+  }
+  echo "$ID"
+  exit
+}
+
 # === upload ===
 [ "$COMMAND" = "upload" ] && {
   # functions
-  check_makefile() {
-    [ -r Makefile ] || die 7 "Failed to find and read Makefile"
-  }
-  parse_makefile_var() {
-    VARNAME="$1"
-    # find VARNAME, strip before '=', print and quit
-    sed -ne "/^[ \t]*$VARNAME[ \t]*=/ { s/^[^=]*=[ \t]*//; p; q }" < Makefile
-  }
   subst_makefile_vars() {
     sed -e "{	s/\$(VERSION)\|\${VERSION}/$VERSION/g ;
 		s/\$(PACKAGE)\|\${PACKAGE}/$PACKAGE/g ;
@@ -215,7 +235,7 @@ done
     printf "%-$I""s%s\\n" "$M1" "$M2"
   }
   # ensure VERSION, fallback to Makefile
-  [ "$VERSION" = "_parse" ] && check_makefile && VERSION="`parse_makefile_var VERSION`"
+  ensure_version
   msg2 "Determine version..." "$VERSION"
   # extract REVISION from last numeric part in VERSION
   REVISION=`echo " $VERSION" | sed -n '/[0-9][ \t]*$/{ s/.*\b\([0-9]\+\)[ \t]*$/\1/ ; p ; q }'`
