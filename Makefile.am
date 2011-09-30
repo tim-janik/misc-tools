@@ -16,7 +16,7 @@ PYCONFIGVARS = "PACKAGE" : "${PACKAGE}", "PACKAGE_NAME" : "${PACKAGE_NAME}", \
 
 # == wikihtml2man.py ==
 bin_SCRIPTS += wikihtml2man
-wikihtml2man: wikihtml2man.py Makefile.am
+wikihtml2man: wikihtml2man.py $(shell $(srcdir)/mkrelease.sh commit-stamps)
 	$(AM_V_GEN)
 	$(Q) sed <$< >xgen-$(@F)                        \
 	  -e '1,1s|#!/usr/bin/env python\([0-9]\+\(\.[0-9]\+\)\?\)\?|#!${PYTHON}|' \
@@ -59,7 +59,7 @@ export TSTDIAGNOSE = _e=$$?; tstdiagnose() { printf '  CHECK  %-64s%s\n' "$${1:-
                                 "$${FAILOK:$$(($$_e?0:6)):6}"; [ $$_e = 0 ] || exit $$_e; }; tstdiagnose
 # == buglist.py ==
 bin_SCRIPTS += buglist
-buglist: buglist.py Makefile.am
+buglist: buglist.py $(shell $(srcdir)/mkrelease.sh commit-stamps)
 	$(AM_V_GEN)
 	$(Q) sed <$< >xgen-$(@F)                        \
 	  -e '1,1s|#!/usr/bin/env python\([0-9]\+\(\.[0-9]\+\)\?\)\?|#!${PYTHON}|' \
