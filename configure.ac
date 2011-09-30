@@ -3,7 +3,7 @@
 
 # == Package Setup ==
 AC_INIT([Testbit.eu/Tools],
-	m4_esyscmd(./mkrelease.sh shellvar configure.ac:TESTBIT_TOOLS_VERSION),
+	m4_esyscmd(/bin/sh ./buildfay.sh shellvar configure.ac:TESTBIT_TOOLS_VERSION),
 	[http://testbit.eu/],
 	[testbit-tools],
 	[http://testbit.eu/Tools])

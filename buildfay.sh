@@ -1,9 +1,10 @@
 #!/bin/bash
-# mkrelease.sh: Copyright (C) 2010 Tim Janik
+# buildfay: Copyright (C) 2010,2011 Tim Janik
 #
 ## This work is provided "as is"; see: http://rapicorn.org/LICENSE-AS-IS
 
-MYVERSION="mkrelease.sh version 20100901"
+MYVERSION="buildfay version 20100930"
+# 20110930: renamed script to buildfay
 # 20110929: implemented 'describe' build version
 # 20110407: extract 'contributors' from NEWS files
 # 20100910: fixed 'commit-stamps' outside of git repos

@@ -4,19 +4,38 @@ ACLOCAL_AMFLAGS = -I autotools
 cache_files     =
 cache_deps      =
 man_MANS        = $(man_targets)
+MYBUILDFAY      = $(shell /bin/sh $(top_srcdir)/buildfay.sh $(1))
+COMMIT_STAMPS   = $(call MYBUILDFAY, commit-stamps) $(top_srcdir)/buildfay.sh
+REVISION        = $(call MYBUILDFAY, describe)
 bin_SCRIPTS=
 EXTRA_DIST=
 CLEANFILES=
 MAINTAINERCLEANFILES=
 Q = $(if $(findstring 1, $(V)) ,, @)
 
-REVISION = $(shell $(srcdir)/mkrelease.sh describe)
+SHCONFIGVARS = PACKAGE="${PACKAGE}"; PACKAGE_NAME="${PACKAGE_NAME}"; VERSION="${VERSION}"; REVISION="$(REVISION)"
 PYCONFIGVARS = "PACKAGE" : "${PACKAGE}", "PACKAGE_NAME" : "${PACKAGE_NAME}", \
                "VERSION" : "${VERSION}", "REVISION"     : "$(REVISION)"
 
+# == buildfay ==
+bin_SCRIPTS += buildfay
+buildfay: buildfay.sh $(COMMIT_STAMPS)
+	$(AM_V_GEN)
+	$(Q) sed <$< >xgen-$(@F)                        \
+	  -e '1,24s|^ *#@PKGINSTALL_CONFIGVARS_IN24LINES@|  ${SHCONFIGVARS}|'
+	$(Q) chmod +x xgen-$(@F)
+	$(Q) cp -p xgen-$(@F) $@ && rm -f xgen-$(@F)
+EXTRA_DIST += buildfay.sh
+CLEANFILES += buildfay
+buildfay-installcheck:
+	$(Q) buildfay --help | grep -qF ChangeLog ; eval "$$TSTDIAGNOSE"
+installcheck-local: buildfay-installcheck
+buildfay-check-describe: ; @ ./buildfay describe   | grep -q "[0-9]\..*-" ; eval "$$TSTDIAGNOSE"
+check: buildfay-check-describe
+
 # == wikihtml2man.py ==
 bin_SCRIPTS += wikihtml2man
-wikihtml2man: wikihtml2man.py $(shell $(srcdir)/mkrelease.sh commit-stamps)
+wikihtml2man: wikihtml2man.py $(COMMIT_STAMPS)
 	$(AM_V_GEN)
 	$(Q) sed <$< >xgen-$(@F)                        \
 	  -e '1,1s|#!/usr/bin/env python\([0-9]\+\(\.[0-9]\+\)\?\)\?|#!${PYTHON}|' \
@@ -59,7 +78,7 @@ export TSTDIAGNOSE = _e=$$?; tstdiagnose() { printf '  CHECK  %-64s%s\n' "$${1:-
                                 "$${FAILOK:$$(($$_e?0:6)):6}"; [ $$_e = 0 ] || exit $$_e; }; tstdiagnose
 # == buglist.py ==
 bin_SCRIPTS += buglist
-buglist: buglist.py $(shell $(srcdir)/mkrelease.sh commit-stamps)
+buglist: buglist.py $(COMMIT_STAMPS)
 	$(AM_V_GEN)
 	$(Q) sed <$< >xgen-$(@F)                        \
 	  -e '1,1s|#!/usr/bin/env python\([0-9]\+\(\.[0-9]\+\)\?\)\?|#!${PYTHON}|' \
@@ -80,18 +99,16 @@ buglist-check-moz: ; @ echo 489834 | ./buglist moz  | grep -q "DXR" ; eval "$$TS
 buglist-check-xm:  ; @ echo    830 | ./buglist xm   | grep -q "MonoDevelop.*MacOS" ; eval "$$TSTDIAGNOSE"
 check: buglist-check-fd buglist-check-gb buglist-check-gcc buglist-check-libc buglist-check-mb buglist-check-moz buglist-check-xm
 
-# == ChangeLog ==
-ChangeLog: $(shell $(srcdir)/mkrelease.sh commit-stamps)
-	$(srcdir)/mkrelease.sh ChangeLog
+# == ChangeLog & Release Rules ==
 noinst_DATA = ChangeLog
-EXTRA_DIST += ChangeLog mkrelease.sh
-
-# == Release Rules ==
-release-news:
-	@$(srcdir)/mkrelease.sh news
-release-check:
+ChangeLog: $(COMMIT_STAMPS) ./buildfay
+	./buildfay ChangeLog
+EXTRA_DIST += ChangeLog
+release-news: ./buildfay
+	@./buildfay news
+release-check: ./buildfay
 	@echo "Checking for unlisted contributors..."
-	@$(srcdir)/mkrelease.sh contributors -X -B timj
-release-upload: ChangeLog
-	$(srcdir)/mkrelease.sh upload -U dist.testbit.eu:dist/testbit-tools/ -E configure.ac:TESTBIT_TOOLS_REVISION
+	@./buildfay contributors -X -B timj
+release-upload: ChangeLog ./buildfay
+	./buildfay upload -U dist.testbit.eu:dist/testbit-tools/ -E configure.ac:TESTBIT_TOOLS_REVISION
 .PHONY: release-news release-check release-upload
