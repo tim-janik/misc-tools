@@ -4,14 +4,31 @@ ACLOCAL_AMFLAGS = -I autotools
 cache_files     =
 cache_deps      =
 man_MANS        = $(man_targets)
+bin_SCRIPTS=
 EXTRA_DIST=
 CLEANFILES=
 MAINTAINERCLEANFILES=
+Q = $(if $(findstring 1, $(V)) ,, @)
+
+REVISION = $(shell $(srcdir)/mkrelease.sh describe)
+PYCONFIGVARS = "PACKAGE" : "${PACKAGE}", "PACKAGE_NAME" : "${PACKAGE_NAME}", \
+               "VERSION" : "${VERSION}", "REVISION"     : "$(REVISION)"
 
 # == wikihtml2man.py ==
-bin_SCRIPTS = wikihtml2man.py
-cache_deps += wikihtml2man.py
+bin_SCRIPTS += wikihtml2man
+wikihtml2man: wikihtml2man.py Makefile.am
+	$(AM_V_GEN)
+	$(Q) sed <$< >xgen-$(@F)                        \
+	  -e '1,1s|#!/usr/bin/env python\([0-9]\+\(\.[0-9]\+\)\?\)\?|#!${PYTHON}|' \
+	  -e '1,24s|^ *#@PKGINSTALL_CONFIGVARS_IN24LINES@|  ${PYCONFIGVARS}|'
+	$(Q) chmod +x xgen-$(@F)
+	$(Q) cp -p xgen-$(@F) $@ && rm -f xgen-$(@F)
 EXTRA_DIST += wikihtml2man.py
+CLEANFILES += wikihtml2man
+cache_deps += wikihtml2man.py
+wikihtml2man-installcheck:
+	$(Q) wikihtml2man --version | grep -qF wikihtml2man ; eval "$$TSTDIAGNOSE"
+installcheck-local: wikihtml2man-installcheck
 
 # == wikihtml2man.1 ==
 man_targets = wikihtml2man.1
@@ -42,7 +59,6 @@ export TSTDIAGNOSE = _e=$$?; tstdiagnose() { printf '  CHECK  %-64s%s\n' "$${1:-
                                 "$${FAILOK:$$(($$_e?0:6)):6}"; [ $$_e = 0 ] || exit $$_e; }; tstdiagnose
 # == buglist.py ==
 bin_SCRIPTS += buglist
-PYCONFIGVARS = "PKG_VERSION" : "${VERSION}"
 buglist: buglist.py Makefile.am
 	$(AM_V_GEN)
 	$(Q) sed <$< >xgen-$(@F)                        \
@@ -51,6 +67,7 @@ buglist: buglist.py Makefile.am
 	$(Q) chmod +x xgen-$(@F)
 	$(Q) cp -p xgen-$(@F) $@ && rm -f xgen-$(@F)
 EXTRA_DIST += buglist.py
+CLEANFILES += buglist
 buglist-installcheck:
 	$(Q) buglist --bug-tracker-list | grep -qF gcc ; eval "$$TSTDIAGNOSE"
 installcheck-local: buglist-installcheck
