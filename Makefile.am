@@ -3,6 +3,8 @@
 ACLOCAL_AMFLAGS = -I autotools
 cache_files     =
 cache_deps      =
+REPO_VERSION   := $(shell git describe)
+BRIEF_VERSION  := $(shell RV="${REPO_VERSION}" && echo $${RV%%-*})
 man_MANS        = $(man_targets)
 MYBUILDFAY      = $(shell /bin/sh $(top_srcdir)/buildfay.sh $(1))
 COMMIT_STAMPS   = $(call MYBUILDFAY, commit-stamps) $(top_srcdir)/buildfay.sh
@@ -13,9 +15,8 @@ CLEANFILES=
 MAINTAINERCLEANFILES=
 Q = $(if $(findstring 1, $(V)) ,, @)
 
-SHCONFIGVARS = MYPACKAGE="${PACKAGE_NAME}"; MYVERSION="${VERSION}"; MYREVISION="$(REVISION)"
-PYCONFIGVARS = "PACKAGE" : "${PACKAGE}", "PACKAGE_NAME" : "${PACKAGE_NAME}", \
-               "VERSION" : "${VERSION}", "REVISION"     : "$(REVISION)"
+SHCONFIGVARS = MYVERSION="${VERSION}"
+PYCONFIGVARS = "VERSION" : "${REPO_VERSION}"
 
 # == buildfay ==
 bin_SCRIPTS += buildfay
