@@ -45,33 +45,23 @@ wikihtml2man: wikihtml2man.py $(COMMIT_STAMPS)
 	$(Q) cp -p xgen-$(@F) $@ && rm -f xgen-$(@F)
 EXTRA_DIST += wikihtml2man.py
 CLEANFILES += wikihtml2man
-cache_deps += wikihtml2man.py
 wikihtml2man-installcheck:
 	$(Q) wikihtml2man --version | grep -qF wikihtml2man ; eval "$$TSTDIAGNOSE"
 installcheck-local: wikihtml2man-installcheck
 
 # == wikihtml2man.1 ==
 man_targets = wikihtml2man.1
-cache_files += cache/wikihtml2man.1
 wikihtml2man-check: wikihtml2man.1
 	@ grep -q '\.TH.*WIKIHTML2MAN' $(srcdir)/wikihtml2man.1 ; eval "$$TSTDIAGNOSE"
 check: wikihtml2man-check
 
 # == man generation ==
-%.1: @MAINTAINER_MODE_TRUE@ cache/%.1
+%.1: @MAINTAINER_MODE_TRUE@ %.1.mwhtml
 	$(AM_V_GEN)
 	$(Q) $(srcdir)/wikihtml2man.py $< >xgen-$@
 	$(Q) mv xgen-$@ $@ ; rm -f xgen-$@
 EXTRA_DIST += $(man_targets)
 CLEANFILES += $(man_targets)
-
-# == online cache ==
-cache/: ; $(Q) mkdir -p $@
-$(cache_files): $(cache_deps) | cache/
-	$(AM_V_GEN)
-	$(Q) curl -sfS http://testbit.eu/$(@F)?action=render >$(@D)/xgen-$(@F)
-	$(Q) mv $(@D)/xgen-$(@F) $@ ; rm -f $(@D)/xgen-$(@F)
-clean-local: @MAINTAINER_MODE_TRUE@ ; rm -rf cache/
 
 # == Test Utilities ==
 export MAKE_TARGET_FILE = $(@F)
